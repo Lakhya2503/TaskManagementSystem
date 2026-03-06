@@ -9,8 +9,6 @@ build
 .gemini
 .gsd/examples
 .gsd/templates
-adapter
+adapters
 docs
 scripts
-GSD-STYLE.md
-PROJECT_RULES.md
