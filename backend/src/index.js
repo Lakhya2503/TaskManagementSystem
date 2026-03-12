@@ -13,7 +13,6 @@ const server = http.createServer(app)
 const port = process.env.PORT || 5002
 
 connectDB().then(()=>{
-
       socketHandler(server)
       server.listen(port,()=>{
             console.log(`server listening the port : ${port}`)

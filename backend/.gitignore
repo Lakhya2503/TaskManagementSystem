@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# env
+.env
+.env.*
+
+# logs
+logs/
+*.log
+
+# build output
+dist/
+build/
+
+# cache
+.cache/
+
+# process files
+pids
+*.pid
+*.pid.lock
+
+# coverage
+coverage/
+
+# misc
+*.local

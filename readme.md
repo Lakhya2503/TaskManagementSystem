@@ -9,7 +9,7 @@ Team Leader
 Intern
 
 Tech Stack:
-React + Vite + TypeScript
+React + Vite + Javascript
 Node.js + Express
 MongoDB Atlas
 JWT Authentication
