@@ -105,10 +105,10 @@ const Navbar = () => {
           {/* Right side - Login button and actions */}
           <div className="flex items-center space-x-4">
             {/* Notification icon */}
-            <button className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 group">
+            {/* <button className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 group">
               <HiOutlineBell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white group-hover:animate-ping"></span>
-            </button>
+            </button> */}
 
             {/* Enhanced Login Button */}
             <Link
