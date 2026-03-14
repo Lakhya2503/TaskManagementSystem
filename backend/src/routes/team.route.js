@@ -1,7 +1,7 @@
 
 import { Router } from "express";
 
-import { addNewMember, createTeam, getTeams, removeTeamLeaderAndAddToTeam, removeTeamMember, setNewTeamLeader } from "../controllers/team.controller.js";
+import { addNewMember, createTeam, getTeams, removeTeamLeaderAndAddToTeam, removeTeamMember, setNewTeamLeader, updateTeam } from "../controllers/team.controller.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 
 
@@ -12,6 +12,8 @@ router.use(verifyJWT)
 router.route("/add/team").post(createTeam)
 
 router.route("/fetch/team").get(getTeams)
+
+router.route("/update/:teamId").patch(updateTeam)
 
 router.route("/add-memeber/team/:teamId").patch(addNewMember)
 

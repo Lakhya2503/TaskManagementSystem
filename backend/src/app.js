@@ -37,7 +37,18 @@ app.use("/api/v1/tms/intern", internRouter)
 app.use("/api/v1/tms/project", projectRouter)
 app.use("/api/v1/tms/team", teamRouter)
 app.use("/api/v1/tms/task", taskRouter)
-
-
+// ======================================================
+// global error handler
+// ======================================================
+app.use((err, req, res, next) => {
+  console.error(err);
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+  res.status(statusCode).json({
+    success: false,
+    message,
+    errors: err.errors || []
+  });
+});
 
 export default app;

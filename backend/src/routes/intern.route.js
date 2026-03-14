@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { uploadFile } from "../middlewares/multer.middleware.js";
-import { addBulkIntern, availableIntern, getAllInterns, internLogin, internLogout } from "../controllers/intern.controller.js";
+import { addBulkIntern, addSingleIntern, availableIntern, getAllInterns, internLogin, internLogout } from "../controllers/intern.controller.js";
 import verifyJWTIntern from "../middlewares/intern.middleware.js";
 import verifyJWT from '../middlewares/auth.middleware.js';
 
@@ -18,6 +18,7 @@ router.route("/add/interns/bulk").post(
     addBulkIntern
 )
 
+router.route("/add/single").post(verifyJWT, addSingleIntern)
 
 router.route("/get/all/interns").get(getAllInterns)
 

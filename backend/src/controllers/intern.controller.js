@@ -121,6 +121,34 @@ const addBulkIntern = asyncHandler(async(req,res)=>{
   } ,"add bulk interns successfully"))
 })
 
+// add single intern
+const addSingleIntern = asyncHandler(async(req,res)=>{
+  const { intern_id, name, email, joinDate, domain, role } = req.body;
+
+  if([intern_id, name, email, joinDate, domain].some(item => !item || String(item).trim() === "")) {
+    throw new ApiError(400, "All fields except role are required");
+  }
+
+  const existing = await Intern.findOne({ internId: intern_id });
+  if(existing) {
+    throw new ApiError(400, "Intern with this ID already exists");
+  }
+
+  const [year, month, day] = joinDate.split("-");
+  const dateOfJoining = new Date(year, month - 1, day);
+
+  const intern = await Intern.create({
+    internId: intern_id,
+    name,
+    email,
+    joiningDate: dateOfJoining,
+    domain,
+    role: role || "intern"
+  });
+
+  return res.status(200).json(new ApiResponse(200, intern, "Intern added successfully"));
+});
+
 //  get all interns
 const getAllInterns = asyncHandler(async(req,res)=>{
 
@@ -131,23 +159,19 @@ const getAllInterns = asyncHandler(async(req,res)=>{
 
 // availableIntern for creating new Team without teamLeader
 const availableIntern = asyncHandler(async(req,res)=>{
+  const { excludeTeamId } = req.query;
+  const teams = await Team.find();
 
-      const teams = await Team.find();
+  let usedIds = [];
+  teams.forEach(t => {
+    if (excludeTeamId && String(t._id) === excludeTeamId) return; // Skip members of the team being edited
+    if (t.team) usedIds.push(...t.team);
+    if (t.teamLeader) usedIds.push(t.teamLeader._id || t.teamLeader);
+  });
 
-      const allIds = teams.flatMap(t => t.team);
-      const teamLeader = teams.map(t => t.teamLeader._id);
+  const freeInterns = await Intern.find({ _id: { $nin: usedIds } }).lean();
 
-       const usedIds = [...allIds, ...teamLeader];
-
-        const freeInterns = await Intern.aggregate([
-          {
-            $match: {
-              _id: { $nin: usedIds }
-            }
-          }
-        ]);
-
-          return res.status(200).json(new ApiResponse(200, freeInterns, "free interns from all intern"))
+  return res.status(200).json(new ApiResponse(200, freeInterns, "free interns from all intern"))
 })
 
 //intern login
@@ -196,6 +220,7 @@ const internLogout = asyncHandler(async(req,res)=>{
 
 export {
   addBulkIntern,
+  addSingleIntern,
   availableIntern,
   getAllInterns,
   internLogin,

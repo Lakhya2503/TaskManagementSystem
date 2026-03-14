@@ -9,6 +9,7 @@ import PagesLayout from './components/Layout/PagesLayout'
 import Login from './components/auth/Login'
 import Register from './pages/Register'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
+import Dashboard from './pages/Dashboard'
 
 const App = () => {
   return (
@@ -26,8 +27,7 @@ const App = () => {
 
       {/* Protected Dashboards */}
       <Route element={<ProtectedRoute allowedRoles={['admin', 'manager']} />}>
-        {/* Placeholder dashboards, replace with actual dashboard components later */}
-        <Route path="/dashboard" element={<div>Dashboard Placeholder</div>} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
 
       {/* 404 Catcher */}

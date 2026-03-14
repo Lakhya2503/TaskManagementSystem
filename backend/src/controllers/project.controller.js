@@ -63,6 +63,23 @@ const updateDeadline = asyncHandler(async(req,res)=>{
   return res.status(200).json(new ApiResponse(200, {} , "project deadline postpond successfully"))
 })
 
+// update full project
+const updateProject = asyncHandler(async(req,res)=>{
+  const { projectId } = req.params;
+  const { projectName, description, startDate, deadline } = req.body;
+
+  const project = await Project.findByIdAndUpdate(projectId, {
+    projectName,
+    description,
+    startDate: new Date(startDate),
+    deadline: new Date(deadline)
+  }, { new: true });
+
+  if(!project) throw new ApiError(404, "Project not found");
+
+  return res.status(200).json(new ApiResponse(200, project, "project updated successfully"));
+})
+
 
 
 
@@ -99,5 +116,6 @@ const updateDeadline = asyncHandler(async(req,res)=>{
 export {
   createProject,
   getAllProject,
-  updateDeadline
+  updateDeadline,
+  updateProject
 };

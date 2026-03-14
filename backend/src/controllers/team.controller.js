@@ -163,11 +163,38 @@ const removeTeamLeaderAndAddToTeam = asyncHandler(async(req,res)=>{
   return res.status(200).json(new ApiResponse(200, {}, "remove team Leader from team and add to team successfully"))
 })
 
+// update team completely (name, leaders, members)
+const updateTeam = asyncHandler(async(req,res)=>{
+  const { teamId } = req.params;
+  const { teamName, teamLeaderId, team } = req.body;
+
+  const existingTeam = await Team.findById(teamId);
+  if(!existingTeam) {
+    throw new ApiError(404, "Team not found");
+  }
+
+  if(teamLeaderId && String(existingTeam.teamLeader) !== String(teamLeaderId)) {
+    if(existingTeam.teamLeader) {
+       await Intern.findByIdAndUpdate(existingTeam.teamLeader, { $set: { role: "intern" }});
+    }
+    await Intern.findByIdAndUpdate(teamLeaderId, { $set: { role: "teamLeader" }});
+  }
+
+  const updatedTeam = await Team.findByIdAndUpdate(teamId, {
+    teamName: teamName || existingTeam.teamName,
+    teamLeader: teamLeaderId || existingTeam.teamLeader,
+    team: team || existingTeam.team
+  }, { new: true });
+
+  return res.status(200).json(new ApiResponse(200, updatedTeam, "Team updated successfully"));
+})
+
 export {
   createTeam,
   getTeams,
   addNewMember,
   setNewTeamLeader,
   removeTeamMember,
-  removeTeamLeaderAndAddToTeam
+  removeTeamLeaderAndAddToTeam,
+  updateTeam
 };

@@ -2,13 +2,15 @@ import fs from 'fs'
 import XLSX from 'xlsx'
 import csv from 'csv-parser'
 
-const csvToJson = (filePath) =>{
-    const result = [];
-    fs.createReadStream(filePath)
-    .pipe(csv())
-    .on('data',(data)=>result.push(data))
-    .on("end" , ()=> {
-    })
+const csvToJson = (filePath) => {
+    return new Promise((resolve, reject) => {
+        const result = [];
+        fs.createReadStream(filePath)
+            .pipe(csv())
+            .on('data', (data) => result.push(data))
+            .on('end', () => resolve(result))
+            .on('error', (err) => reject(err));
+    });
 }
 
 const xlsxToJson = (filePath) =>  {
