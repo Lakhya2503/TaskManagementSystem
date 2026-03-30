@@ -154,27 +154,48 @@ export const deleteTeam = (data) => {
 // ------------------------------ X ------------------------------------
 //
 
-export const createProjectTask = (data) => {
+export const createTask = (data) => {
   return apiClient.post("/task/new-task", data);
 }
+export const createProjectTask = createTask;
 
+export const getTasks = (params) => {
+  return apiClient.get("/task/get/tasks", { params });
+}
 export const getProjectTask = (data) => {
-  return apiClient.get(`/task/get/task/${data.projectId}`);
+  return apiClient.get(`/task/get/task/${data.projectId}`); // legacy
 }
 
+export const updateTask = (taskId, data) => {
+  return apiClient.patch(`/task/update/${taskId}`, data);
+}
 export const updateProjectTask = (data) => {
-  return apiClient.patch(`/task/update/${data.taskId}`, data);
+  return updateTask(data.taskId, data);
+}
+
+export const deleteTask = (taskId) => {
+  return apiClient.delete(`/task/delete/${taskId}`);
 }
 
 // ------------------------------ X ------------------------------------
 // reports
 
-export const submitTaskReport = (data) => {
+export const submitReport = (data) => {
   return apiClient.post("/report/submit", data);
 }
 
+export const submitTaskReport = submitReport;
+
+export const getMyReports = (params) => {
+  return apiClient.get("/report/my-reports", { params });
+}
+
+export const getTeamReports = (teamId, params) => {
+  return apiClient.get(`/report/team/${teamId}`, { params });
+}
+
 export const getTaskReports = (data) => {
-  return apiClient.get(`/report/task/${data.taskId}`);
+  return apiClient.get(`/report/task/${data.taskId}`); // legacy
 }
 
 
