@@ -19,8 +19,12 @@ const InviteMemberModal = ({
 
   const roles = [
     { value: 'INTERN', label: 'Intern', icon: FiUserPlus, color: 'green', description: 'Limited access for learning and development' },
-    { value: 'MANAGER', label: 'Manager', icon: FiUserCheck, color: 'blue', description: 'Can manage projects and teams' },
-    { value: 'ADMIN', label: 'Admin', icon: FiShield, color: 'purple', description: 'Full control over workspace' }
+    { value: 'TEAM_MEMBER', label: 'Team Member', icon: FiUserCheck, color: 'blue', description: 'Standard member access' },
+    { value: 'TEAM_LEADER', label: 'Team Leader', icon: FiUserCheck, color: 'indigo', description: 'Can lead teams and assign tasks' },
+    ...((isSuperuser || userRole === 'Admin' || userRole === 'ADMIN') ? [
+      { value: 'MANAGER', label: 'Manager', icon: FiShield, color: 'purple', description: 'Can manage projects and teams' },
+      { value: 'ADMIN', label: 'Admin', icon: FiShield, color: 'red', description: 'Full control over workspace' }
+    ] : [])
   ];
 
   const copyToClipboard = (text) => {
@@ -197,7 +201,7 @@ const InviteMemberModal = ({
                 <button
                   onClick={() => {
                     setGeneratedLink(null);
-                    setInviteData({ email: '', role: 'MANAGER' });
+                    setInviteData({ email: '', role: 'TEAM_MEMBER' });
                   }}
                   className="flex-1 bg-gradient-to-r from-gray-800 to-gray-900 text-white py-2.5 rounded-xl hover:from-gray-900 hover:to-black transition-all font-medium"
                 >

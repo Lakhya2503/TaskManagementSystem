@@ -73,9 +73,8 @@ const Dashboard = ({
   // Check if user can view but not modify (member view)
   const isMemberOnly = !hasManagementAccess && !isSuperuser;
 
-  // UPDATED: Check if user can invite members - ONLY hide for MANAGER role
-  // Show for ADMIN, SUPERUSER, or if explicitly allowed, but NOT for MANAGER
-  const canInviteMembersAccess = (currentUserRole === "ADMIN" || isSuperuser || canInviteMembers) && currentUserRole !== "MANAGER";
+  // Show for ADMIN, SUPERUSER, or if explicitly allowed. Managers can invite members per new RBAC rule.
+  const canInviteMembersAccess = currentUserRole === "MANAGER" || currentUserRole === "ADMIN" || isSuperuser || canInviteMembers;
 
   // Calculate statistics
   useEffect(() => {
