@@ -8,7 +8,7 @@ export const registerAdmin = (data) => {
 }
 
 export const commonLogin = (data) => {
-    console.log("data",data);
+
     return apiClient.post("/auth/user/login", data);
 }
 
@@ -89,7 +89,7 @@ export const createProject = (data) => {
 }
 
 export const getProjects = (data) => {
-  console.log("data",data);
+
   return apiClient.get(`/project/workspace/${data.workspaceId}`); // Added return
 }
 
@@ -115,7 +115,7 @@ export const getprojectOfUser = () => {
 // team
 
 export const createTeam = (data) => {
-  console.log("data 3",data);
+
   return apiClient.post("/team/add/team", data); // Added return
 }
 
@@ -204,7 +204,7 @@ export const getTaskReports = (data) => {
 // workplace invait token
 
 export const generateInviteToken = (data) => {
-    console.log("data",data);
+
     return apiClient.post("/invite/generate", data);
 }
 

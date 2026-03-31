@@ -84,9 +84,6 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
 // Superuser: Add a Manager to a Workspace
 const addWorkspaceManager = asyncHandler(async (req, res) => {
 
-  console.log(req.body);
-
-
     const { workspaceId } = req.params;
     const { userId } = req.body; // Internal User ID from the global pool
 

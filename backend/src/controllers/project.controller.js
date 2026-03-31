@@ -10,9 +10,6 @@ const createProject = asyncHandler(async (req, res) => {
     const { workspaceId, projectName, description, startDate, deadline } = req.body;
     const user = req.user;
 
-    console.log(req.body);
-
-
     if (!workspaceId || !projectName || !startDate || !deadline) {
         throw new ApiError(400, "workspaceId, projectName, startDate, and deadline are required");
     }

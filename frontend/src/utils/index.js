@@ -136,7 +136,7 @@ export const requestHandler = async (api, setLoading, onSuccess, onError) => {
 
     const response = await api();
     const data = response?.data ?? response ?? null;
-    console.log("data",data);
+
 
     if (!data) throw new Error("No data received from API");
 

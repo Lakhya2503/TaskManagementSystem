@@ -42,8 +42,6 @@ const verifySuperuser = asyncHandler(async(req, res, next) => {
 // Verifies if the user is at least a member of the workspace
 const verifyWorkspaceMember = asyncHandler(async(req, res, next) => {
 
-  console.log("req.body",req.body)
-
     const workspaceId = req.header("x-workspace-id") || req.body?.workspaceId || req.params?.workspaceId;
     
     if(!workspaceId) {
@@ -66,8 +64,6 @@ const verifyWorkspaceMember = asyncHandler(async(req, res, next) => {
 
 // Verifies if the user is a MANAGER or ADMIN in the workspace
 const verifyWorkspaceAdmin = asyncHandler(async(req, res, next) => {
-
-      console.log("req.body",req.body)
 
     const workspaceId = req.header("x-workspace-id") || req.body?.workspaceId || req.params?.workspaceId;
     if(!workspaceId) {

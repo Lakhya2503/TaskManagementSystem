@@ -49,9 +49,6 @@ const getTeams = asyncHandler(async (req, res) => {
           const { workspaceId } = req.params;
           const userId = req.user._id;
 
-          console.log("user",userId);
-
-
           const workspace = await Workspace.findById(workspaceId);
 
           if (!workspace) {
@@ -63,9 +60,6 @@ const getTeams = asyncHandler(async (req, res) => {
             .populate("teamLeader", "name email avatar")
             .populate("projectId", "projectName description startDate deadline createdBy");
 
-          console.log("teams", teams);
-
-
           const isUserInAnyTeam = await teams.map((team) =>
             team.team.map((memberId) =>
               memberId.toString() === userId.toString()
@@ -76,8 +70,6 @@ const getTeams = asyncHandler(async (req, res) => {
           if (!isUserInAnyTeam) {
             throw new ApiError(403, "User is not part of any team");
           }
-
-          console.log("teams", teams);
 
           return res.status(200).json(
             new ApiResponse(200, teams, "fetch teams")
@@ -112,9 +104,6 @@ const addNewMember = asyncHandler(async(req,res)=>{
             { $addToSet: { team: user._id } },
             { new: true }
           );
-
-          console.log("Updated team:", updatedTeam.team);
-
 
     return res.status(200).json(new ApiResponse(200, {}, "team update successfully"))
 })
