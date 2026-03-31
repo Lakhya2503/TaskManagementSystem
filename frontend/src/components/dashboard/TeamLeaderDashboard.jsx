@@ -108,8 +108,13 @@ const TeamLeaderDashboard = () => {
       (res) => {
         const allProjects = res.data || res;
         // Filter to only projects that my teams are assigned to
-        const myProjectIds = teams.map(t => t.projectId?._id || t.projectId).filter(Boolean);
-        const myProjects = allProjects.filter(p => myProjectIds.includes(p._id));
+        const myProjectIds = teams.map(t => {
+          const pid = t.projectId;
+          if (!pid) return null;
+          return typeof pid === 'object' ? String(pid._id) : String(pid);
+        }).filter(Boolean);
+        const myProjects = allProjects.filter(p => myProjectIds.includes(String(p._id)));
+        // Show filtered projects if any, else show all workspace projects
         setProjects(myProjects.length > 0 ? myProjects : allProjects);
       },
       (err) => console.error("Failed to load projects", err)
@@ -133,7 +138,11 @@ const TeamLeaderDashboard = () => {
     requestHandler(
       () => getTeamReports(selectedTeam._id, {}),
       setLoading,
-      (res) => setReports(res.data || res),
+      (res) => {
+        // API returns ApiResponse: { data: reports } — handle nested extraction
+        const reportData = res?.data?.data || res?.data || res;
+        setReports(Array.isArray(reportData) ? reportData : []);
+      },
       (err) => console.error("Failed to load reports", err)
     );
   }, [selectedTeam]);
@@ -422,12 +431,26 @@ const TeamLeaderDashboard = () => {
             <div className="space-y-6">
               {/* Welcome */}
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-                <h2 className="text-2xl font-bold mb-1">
-                  {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, {user?.name?.split(' ')[0] || 'Leader'}!
-                </h2>
-                <p className="text-indigo-100 text-sm">
-                  You're leading <strong>{teams.length}</strong> team{teams.length > 1 ? 's' : ''} in <strong>{workspace?.name || 'this workspace'}</strong>
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-1">
+                      {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, {user?.name?.split(' ')[0] || 'Leader'}!
+                    </h2>
+                    <p className="text-indigo-100 text-sm">
+                      You're leading <strong>{teams.length}</strong> team{teams.length > 1 ? 's' : ''} in <strong>{workspace?.name || 'this workspace'}</strong>
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowTaskModal(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl font-medium text-sm transition-all backdrop-blur-sm border border-white/20">
+                      <FiPlus size={16} /> Assign Task
+                    </button>
+                    <button onClick={() => { setActiveTab('reports'); loadReports(); }}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium text-sm transition-all backdrop-blur-sm border border-white/10">
+                      <FiFileText size={16} /> View Reports
+                    </button>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Stats */}

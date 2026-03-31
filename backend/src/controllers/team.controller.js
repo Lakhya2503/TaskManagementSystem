@@ -60,7 +60,8 @@ const getTeams = asyncHandler(async (req, res) => {
 
           const teams = await Team.find({ workspaceId })
             .populate("team", "name email avatar")
-            .populate("teamLeader", "name email avatar");
+            .populate("teamLeader", "name email avatar")
+            .populate("projectId", "projectName description startDate deadline createdBy");
 
           console.log("teams", teams);
 
