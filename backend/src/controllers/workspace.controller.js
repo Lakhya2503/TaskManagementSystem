@@ -55,7 +55,6 @@ const getWorkspaces = asyncHandler(async (req, res) => {
 // Any User: Get a single workspace by ID (if they have access)
 const getWorkspaceById = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
-    // console.log("workpalceId" , workspaceId);
 
 
     const workspace = await Workspace.findById(workspaceId)
@@ -83,7 +82,6 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
 
 // const addMemmberonWorkplace = asyncHandler(async(req,res)=>{
 
-//       console.log(req.body);
 
 
 // })
@@ -240,4 +238,3 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
 });
 
 export { createWorkspace, getWorkspaces, getWorkspaceById, addWorkspaceManager, inviteUserToWorkspace, updateWorkspaceMemberRole, removeWorkspaceMember, getMyWorkspaceRole, deleteWorkspace };
-

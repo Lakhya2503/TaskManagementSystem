@@ -1,17 +1,20 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import PagesLayout from './components/Layout/PagesLayout';
+import ProtectedRoute from './components/Layout/ProtectedRoute';
+import Login from './components/auth/Login';
+import AcceptInvite from './components/components/AcceptInvite';
+import WorkPlaceHome from './components/components/WorkPlaceHome';
+import WorkspaceRoleRouter from './components/dashboard/WorkspaceRoleRouter';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Help from './pages/Help';
-import PagesLayout from './components/Layout/PagesLayout';
-import Login from './components/auth/Login';
+import Home from './pages/Home';
+import NotFoundPage from './pages/NotFoundPage';
 import Register from './pages/Register';
-import ProtectedRoute from './components/Layout/ProtectedRoute';
-import WorkPlaceHome from './components/components/WorkPlaceHome';
-import AcceptInvite from './components/components/AcceptInvite';
-import NotFoundPage from './pages/NotFoundPage'
-import WorkspaceRoleRouter from './components/dashboard/WorkspaceRoleRouter';
+import ForgotPasswordRequset from './components/auth/ForgotPasswordRequset'
+import ResetPassword from './components/auth/ResetPassword'
+
+
 
 const App = () => {
   return (
@@ -26,6 +29,8 @@ const App = () => {
 
       {/* Auth Routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password-request" element={<ForgotPasswordRequset />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/register" element={<Register />} />
       <Route path="/accept-invite" element={<AcceptInvite />} />
 

@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
         changeCurrentPassword,
+        forgotPasswordRequest,
         registerUser,
+        resetForgotPassword,
         updateAvatar,
         updateUserProfileFileds,
         userFetch,
@@ -9,6 +11,7 @@ import {
         userLoggedOut
   }  from "../controllers/auth.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { uploadImage } from "../middlewares/multer.middleware.js";
 
 
 const router = Router()
@@ -22,11 +25,21 @@ router.route("/user/logout").post(verifyJWT, userLoggedOut)
 
 router.route("/user/fetch").get(verifyJWT, userFetch)
 
-router.route("/user/update-profile").get(verifyJWT, updateUserProfileFileds)
+router.route("/user/update-profile").put(verifyJWT, updateUserProfileFileds)
 
-router.route("/user/change-password").get(verifyJWT, changeCurrentPassword)
+router.route("/user/change-password").post(verifyJWT, changeCurrentPassword)
 
-router.route("/user/update-avatar").get(verifyJWT, updateAvatar)
+router.route("/user/update-avatar").put(uploadImage.fields(
+  [
+    {
+      name : "avatar",
+      maxSize: 1
+    }
+  ]
+),verifyJWT, updateAvatar)
 
+router.route('/user/forgot-password-request').post(forgotPasswordRequest)
+
+router.route("/user/reset-password").post(resetForgotPassword)
 
 export default router;

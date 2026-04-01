@@ -12,9 +12,6 @@ const verifyJWTInter = async(req,_,next) => {
             throw new ApiError(400, "token not found")
           }
 
-          console.log("token",process.env
-            .ACCESS_TOKEN_SECRET);
-
           const decodedToken =  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
           if(!decodedToken) {

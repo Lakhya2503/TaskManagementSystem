@@ -1,6 +1,7 @@
 import { compare, hash } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { model, Schema } from "mongoose"
+import crypto from 'crypto'
 
 const userSchema = new Schema(
   {
@@ -52,6 +53,12 @@ const userSchema = new Schema(
       internId: {
         type: String,
         default: undefined
+      },
+      forgotPasswordToken : {
+        type : String
+      },
+      forgotPasswordExpiry : {
+        type : Date
       }
   },
   { timestamps : true }
@@ -92,6 +99,21 @@ userSchema.methods.generateRefreshToken = function () {
     expiresIn : process.env.REFRESH_TOKEN_EXPIRY || "15m"
   })
 }
+
+
+userSchema.methods.generateTemporaryToken = function() {
+    const unHashedToken = crypto.randomBytes(20).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(unHashedToken)
+      .digest("hex");
+
+    const tokenExpiry = Date.now() + 15 * 60 * 1000;
+
+    return { unHashedToken, hashedToken, tokenExpiry };
+}
+
+
 
 const User = model("User", userSchema)
 

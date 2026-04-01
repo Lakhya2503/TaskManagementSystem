@@ -1,18 +1,38 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  FiCheckCircle, FiClock, FiFileText, FiRefreshCw, FiHome, FiFolder, FiUsers,
-  FiUser, FiList, FiLogOut, FiMenu, FiBriefcase, FiTarget, FiActivity,
-  FiBarChart2, FiCalendar, FiAlertCircle, FiLoader, FiEdit2, FiSave,
-  FiX, FiCamera, FiLock, FiPhone, FiShield, FiMail, FiChevronRight, FiSend
+  FiActivity,
+  FiAlertCircle,
+  FiBarChart2,
+  FiBriefcase,
+  FiCalendar,
+  FiCheckCircle,
+  FiChevronRight,
+  FiClock, FiFileText,
+  FiFolder,
+  FiHome,
+  FiList,
+  FiLoader,
+  FiLogOut, FiMenu,
+  FiRefreshCw,
+  FiSend,
+  FiTarget,
+  FiUser,
+  FiUsers
 } from 'react-icons/fi';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  getMyReports,
+  getProjects,
+  getTasks,
+  getTeams,
+  getWorkspaceById, getWorkspaces, loggedOutUser,
+  submitReport,
+  updateTask
+} from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import { requestHandler } from '../../utils';
-import {
-  getTasks, updateTask, submitReport, getMyReports, getTeams, getProjects,
-  getWorkspaceById, getWorkspaces, loggedOutUser, changeCurrentPassword, updateUserProfile, updateUserAvatar
-} from '../../api';
+import Profile from '../components/Profile';
 
 const TeamMemberDashboard = () => {
   const { workspaceId } = useParams();
@@ -35,24 +55,13 @@ const TeamMemberDashboard = () => {
   // Report Form
   const [reportForm, setReportForm] = useState({ projectId: '', teamId: '', reportText: '', hoursWorked: '' });
 
-  // Toast & Profile
+  // Toast
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [isEditing, setIsEditing] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [avatarLoading, setAvatarLoading] = useState(false);
-  const fileInputRef = useRef(null);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', domain: '', bio: '' });
-  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
   };
-
-  useEffect(() => {
-    if (user) setFormData({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', domain: user?.domain || '', bio: user?.bio || '' });
-  }, [user]);
 
   // Load workspace
   useEffect(() => {
@@ -144,32 +153,6 @@ const TeamMemberDashboard = () => {
     );
   };
 
-  const handleUpdateProfile = (e) => {
-    e.preventDefault();
-    requestHandler(() => updateUserProfile(formData), setProfileLoading,
-      (r) => { setUser(r?.data || r); setIsEditing(false); showToast('Profile updated! ✨'); },
-      (e) => showToast(e?.message || 'Failed', 'error')
-    );
-  };
-  const handleAvatarUpdate = (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    const fd = new FormData(); fd.append('avatar', file);
-    requestHandler(() => updateUserAvatar(fd), setAvatarLoading,
-      (r) => { setUser(r?.data || r); showToast('Avatar updated! 📸'); },
-      (e) => showToast(e?.message || 'Failed', 'error')
-    );
-  };
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) { showToast('Passwords do not match', 'error'); return; }
-    if (passwordData.newPassword.length < 6) { showToast('Min 6 characters', 'error'); return; }
-    requestHandler(
-      () => changeCurrentPassword({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword }),
-      setProfileLoading,
-      () => { setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setIsChangingPassword(false); showToast('Password changed! 🔒'); },
-      (e) => showToast(e?.message || 'Failed', 'error')
-    );
-  };
   const handleLogout = () => {
     requestHandler(() => loggedOutUser(), setLoading, () => { logout(); window.location.href = '/login'; }, () => {});
   };
@@ -292,8 +275,7 @@ const TeamMemberDashboard = () => {
         </header>
 
         <div className="p-6">
-
-          {/* ─── DASHBOARD TAB ─────────────────── */}
+          {/* DASHBOARD TAB */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
@@ -379,7 +361,7 @@ const TeamMemberDashboard = () => {
             </div>
           )}
 
-          {/* ─── PROJECTS TAB ──────────────────── */}
+          {/* PROJECTS TAB */}
           {activeTab === 'projects' && (
             <div className="space-y-6">
               <div><h2 className="text-2xl font-bold text-gray-800">My Projects</h2><p className="text-sm text-gray-500 mt-1">Projects your teams are working on</p></div>
@@ -422,7 +404,7 @@ const TeamMemberDashboard = () => {
             </div>
           )}
 
-          {/* ─── MY TEAM TAB ───────────────────── */}
+          {/* MY TEAM TAB */}
           {activeTab === 'myteam' && (
             <div className="space-y-6">
               <div><h2 className="text-2xl font-bold text-gray-800">My Team</h2><p className="text-sm text-gray-500 mt-1">Your teammates &amp; team leaders</p></div>
@@ -479,7 +461,7 @@ const TeamMemberDashboard = () => {
             </div>
           )}
 
-          {/* ─── TASKS TAB (Kanban) ────────────── */}
+          {/* TASKS TAB (Kanban) */}
           {activeTab === 'tasks' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
@@ -536,7 +518,7 @@ const TeamMemberDashboard = () => {
             </div>
           )}
 
-          {/* ─── REPORTS TAB ───────────────────── */}
+          {/* REPORTS TAB */}
           {activeTab === 'reports' && (
             <div className="space-y-6">
               <div><h2 className="text-2xl font-bold text-gray-800">Daily Report</h2><p className="text-sm text-gray-500 mt-1">Submit your daily work log &amp; view history</p></div>
@@ -620,85 +602,8 @@ const TeamMemberDashboard = () => {
             </div>
           )}
 
-          {/* ─── PROFILE TAB ───────────────────── */}
-          {activeTab === 'profile' && (
-            <div className="max-w-4xl mx-auto space-y-6">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="h-28 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
-                <div className="relative px-6 pb-6">
-                  <div className="absolute -top-12 left-6">
-                    <div className="relative">
-                      <img src={getAvatarUrl(user)} alt="" className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white object-cover" />
-                      <button onClick={() => fileInputRef.current?.click()} disabled={avatarLoading}
-                        className="absolute bottom-0 right-0 p-1.5 bg-emerald-600 rounded-full text-white shadow hover:bg-emerald-700 transition-all">
-                        {avatarLoading ? <FiLoader className="w-3 h-3 animate-spin" /> : <FiCamera className="w-3 h-3" />}
-                      </button>
-                      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpdate} className="hidden" />
-                    </div>
-                  </div>
-                  <div className="mt-16 flex flex-col md:flex-row justify-between items-start gap-4">
-                    <div>
-                      {isEditing ? (
-                        <div className="space-y-2">
-                          <input type="text" value={formData.name} onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                            className="text-2xl font-bold text-gray-900 bg-gray-50 border rounded-lg px-3 py-1 focus:ring-2 focus:ring-emerald-500 w-full" />
-                          <input type="email" value={formData.email} onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
-                            className="text-gray-600 bg-gray-50 border rounded-lg px-3 py-1 focus:ring-2 focus:ring-emerald-500 w-full" />
-                        </div>
-                      ) : (
-                        <div>
-                          <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
-                          <p className="text-gray-500 flex items-center gap-1 mt-1"><FiMail size={14} /> {user?.email}</p>
-                          {user?.phone && <p className="text-gray-500 flex items-center gap-1 mt-0.5"><FiPhone size={14} /> {user.phone}</p>}
-                          <div className="flex gap-2 mt-2">
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Team Member</span>
-                            {user?.domain && <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full">{user.domain}</span>}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      {!isEditing && !isChangingPassword && (
-                        <>
-                          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all text-sm font-medium"><FiEdit2 size={14} /> Edit</button>
-                          <button onClick={() => setIsChangingPassword(true)} className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"><FiLock size={14} /> Password</button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {isEditing && (
-                    <div className="mt-6 flex gap-3 pt-4 border-t border-gray-200">
-                      <button onClick={handleUpdateProfile} disabled={profileLoading}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 font-medium">
-                        {profileLoading ? <FiLoader className="animate-spin" /> : <FiSave size={14} />} Save
-                      </button>
-                      <button onClick={() => { setIsEditing(false); setFormData({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', domain: user?.domain || '', bio: user?.bio || '' }); }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 font-medium text-gray-700"><FiX size={14} /> Cancel</button>
-                    </div>
-                  )}
-                  {isChangingPassword && (
-                    <form onSubmit={handlePasswordChange} className="mt-6 pt-4 border-t border-gray-200 space-y-4">
-                      <h3 className="text-lg font-bold text-gray-800">Change Password</h3>
-                      {['currentPassword', 'newPassword', 'confirmPassword'].map(field => (
-                        <input key={field} type="password" required placeholder={field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
-                          value={passwordData[field]} onChange={(e) => setPasswordData(p => ({ ...p, [field]: e.target.value }))}
-                          className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-500 bg-gray-50" />
-                      ))}
-                      <div className="flex gap-3">
-                        <button type="submit" disabled={profileLoading}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 font-medium">
-                          {profileLoading ? <FiLoader className="animate-spin" /> : <FiLock size={14} />} Update
-                        </button>
-                        <button type="button" onClick={() => { setIsChangingPassword(false); setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); }}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 font-medium text-gray-700"><FiX size={14} /> Cancel</button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-              </motion.div>
-            </div>
-          )}
-
+          {/* PROFILE TAB - Using the imported Profile component */}
+          {activeTab === 'profile' && <Profile />}
         </div>
       </main>
     </div>

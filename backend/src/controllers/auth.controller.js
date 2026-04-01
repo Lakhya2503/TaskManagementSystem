@@ -1,7 +1,10 @@
+import { uploadFile } from '../middlewares/multer.middleware.js'
 import User from '../models/user.model.js'
 import ApiError from '../utils/ApiError.js'
 import ApiResponse from '../utils/ApiResponse.js'
 import asyncHandler from '../utils/asyncHandler.js'
+import uploadAvatar from '../utils/cloudinary.js'
+import crypto from 'crypto'
 
 // options of login/logout security and http
  const options = {
@@ -128,16 +131,18 @@ const userFetch = asyncHandler(async(req,res)=>{
 
 
 const changeCurrentPassword = asyncHandler(async(req,res)=>{
-    const { newPassword, oldPassword } = req.body
+    const { newPassword, currentPassword } = req.body
 
-    if([newPassword,oldPassword].some((field)=> String(field).trim()=== "" || field === undefined)) {
+
+
+    if([newPassword,currentPassword].some((field)=> String(field).trim()=== "" || field === undefined)) {
       throw new ApiError(400, "all fields are required")
     }
 
 
     const user = await User.findById(req.user?._id)
 
-    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+    const isPasswordCorrect = await user.isPasswordCorrect(currentPassword)
 
     if(!isPasswordCorrect) {
       throw new ApiError(400, "Credientials faild please enter valid password")
@@ -158,7 +163,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
 const updateAvatar = asyncHandler(async(req,res)=>{
 
 
-    const avatar = req.files
+    const avatar = req.files?.avatar?.[0]?.path
 
     if(!avatar) {
       throw new ApiError(400, "User avatar required")
@@ -172,6 +177,14 @@ const updateAvatar = asyncHandler(async(req,res)=>{
 
 
 
+    const avatarURI = await uploadAvatar(avatar)
+
+
+    await User.findByIdAndUpdate(user._id, {
+        $set : {
+          avatar : avatarURI.url
+        }
+    }, { new : true}).select("-password -refreshToken")
 
 
 
@@ -200,6 +213,71 @@ const updateUserProfileFileds = asyncHandler(async(req,res)=>{
 })
 
 
+const forgotPasswordRequest = asyncHandler(async(req,res)=>{
+
+  const { email } = req.body
+
+  if(!email || email.trim() === "") {
+    throw new ApiError(400, "Email is required")
+  }
+
+  const user = await User.findOne({ email })
+
+  if(!user) {
+    throw new ApiError(400, "User not found")
+  }
+
+  const { unHashedToken, hashedToken, tokenExpiry } = await user.generateTemporaryToken();
+
+  user.forgotPasswordExpiry = tokenExpiry;
+  user.forgotPasswordToken = hashedToken;
+
+  await user.save({validateBeforeSave : false})
+
+  const forgotPasswordUrl = `${process.env.FORGET_PASSWORD_REDIRECT_URL}?token=${unHashedToken}`
+
+  return res.status(200).json(new ApiResponse(200, { forgotPasswordUrl }, "Forgot password token generated successfully"))
+})
+
+
+const resetForgotPassword = asyncHandler(async(req,res)=>{
+
+  const { token, newPassword } = req.body
+
+  if(!token || !newPassword || token.trim() === "" || newPassword.trim() === "") {
+    throw new ApiError(400, "Token and new password are required")
+  }
+
+
+  const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+
+  const user = await User.findOne({
+      forgotPasswordToken : hashedToken,
+      forgotPasswordExpiry : { $gt : Date.now() }
+   })
+
+  if(!user) {
+    throw new ApiError(400, "User not found")
+  }
+
+  if(user.forgotPasswordExpiry < Date.now()) {
+    throw new ApiError(400, "Token expired")
+  }
+
+  user.password = newPassword
+   user.forgotPasswordToken = undefined
+  user.forgotPasswordExpiry = undefined
+
+  await user.save({validateBeforeSave : true})
+
+  return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"))
+})
+
+
 
 export {
   registerUser,
@@ -208,5 +286,7 @@ export {
    userLoggedOut,
    changeCurrentPassword,
    updateUserProfileFileds,
-   updateAvatar
+   updateAvatar,
+   forgotPasswordRequest,
+   resetForgotPassword
 }

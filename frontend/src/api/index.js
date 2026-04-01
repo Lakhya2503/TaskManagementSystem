@@ -32,6 +32,13 @@ export const updateUserAvatar = (data) => {
   return apiClient.put("/auth/user/update-avatar", data);
 }
 
+export const forgetPasswordRequest = (data) => {
+  return apiClient.post("/auth/user/forgot-password-request", data)
+}
+
+export const changePassword = (data) => {
+  return apiClient.post("/auth/user/reset-password", data)
+}
 
 
 // ------------------------------ X ------------------------------------
@@ -45,6 +52,9 @@ export const getAllUsers = () => {
   return apiClient.get("/user/all");
 }
 
+export const changeNewPassword = () => {
+  return apiClient.get("/user/change-new-password")
+}
 
 // ------------------------------ X ------------------------------------
 // workplace apis
@@ -78,7 +88,7 @@ export const getWorkspaceById = (data) => {
 }
 
 export const getMyWorkspaceRole = (workspaceId) => {
-  return apiClient.get(`/workspace/${workspaceId}/my-role`); 
+  return apiClient.get(`/workspace/${workspaceId}/my-role`);
 }
 
 export const deleteWorkspace = (workspaceId) => {
