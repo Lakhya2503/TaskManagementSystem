@@ -522,9 +522,11 @@ const WorkPlaceHome = () => {
       loadWorkspaceDetails(selectedWorkplace);
       loadProjects();
       loadTeams();
-      loadInterns();
+      if (isSuperuser) {
+        loadInterns();
+      }
     }
-  }, [selectedWorkplace, isAuthenticated, loadWorkspaceDetails, loadProjects, loadTeams, loadInterns]);
+  }, [selectedWorkplace, isAuthenticated, isSuperuser, loadWorkspaceDetails, loadProjects, loadTeams, loadInterns]);
 
   // Load global users for superuser
   useEffect(() => {
@@ -1447,6 +1449,28 @@ const WorkPlaceHome = () => {
                     )}
                   </AnimatePresence>
                 </div>
+                
+                {/* Create and Delete Workplace Buttons */}
+                {(isSuperuser || currentUserRole === 'ADMIN') && (
+                  <div className="hidden sm:flex items-center gap-2 ml-2">
+                    <button
+                      onClick={() => setShowCreateWorkplaceModal(true)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                    >
+                      <FiPlus className="w-4 h-4" />
+                      Create Workplace
+                    </button>
+                    {selectedWorkplace && (
+                      <button
+                        onClick={() => setShowDeleteWorkplaceModal(true)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                      >
+                        <FiAlertCircle className="w-4 h-4" />
+                        Delete Workplace
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-6">

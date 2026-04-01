@@ -195,20 +195,6 @@ const Dashboard = ({
       color: 'bg-purple-600 hover:bg-purple-700'
     },
     {
-      label: 'Create Workplace',
-      icon: FiPlus,
-      onClick: () => setShowCreateWorkplaceModal(true),
-      visible: canCreateWorkplaceAccess,
-      color: 'bg-orange-600 hover:bg-orange-700'
-    },
-    {
-      label: 'Delete Workplace',
-      icon: FiAlertCircle,
-      onClick: () => setShowDeleteWorkplaceModal(true),
-      visible: canCreateWorkplaceAccess,
-      color: 'bg-red-600 hover:bg-red-700'
-    },
-    {
       label: 'Create Team',
       icon: FiUsers,
       onClick: () => setShowCreateTeamModal(true),
