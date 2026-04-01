@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMyWorkspaceRole } from '../../api';
 import { FiLoader, FiAlertCircle } from 'react-icons/fi';
-import WorkPlaceHome from '../componetns/WorkPlaceHome'; // existing manager dashboard
+import WorkPlaceHome from '../components/WorkPlaceHome'; // existing manager dashboard
 import TeamLeaderDashboard from './TeamLeaderDashboard';
 import TeamMemberDashboard from './TeamMemberDashboard';
 import { useAuth } from '../../context/AuthContext';
@@ -11,7 +11,7 @@ const WorkspaceRoleRouter = () => {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  
+
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

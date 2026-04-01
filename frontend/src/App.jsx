@@ -8,8 +8,8 @@ import PagesLayout from './components/Layout/PagesLayout';
 import Login from './components/auth/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
-import WorkPlaceHome from './components/componetns/WorkPlaceHome';
-import AcceptInvite from './components/componetns/AcceptInvite';
+import WorkPlaceHome from './components/components/WorkPlaceHome';
+import AcceptInvite from './components/components/AcceptInvite';
 import NotFoundPage from './pages/NotFoundPage'
 import WorkspaceRoleRouter from './components/dashboard/WorkspaceRoleRouter';
 
